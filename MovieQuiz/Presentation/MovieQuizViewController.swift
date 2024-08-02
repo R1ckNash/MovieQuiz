@@ -60,11 +60,11 @@ final class MovieQuizViewController: UIViewController {
     
     //MARK: - Actions
     @IBAction private func yesButtonClicked(_ sender: UIButton) {
-        handleAnswer(button: sender, isCorrect: true)
+        handleAnswer(isCorrect: true)
     }
     
     @IBAction private func noButtonClicked(_ sender: UIButton) {
-        handleAnswer(button: sender, isCorrect: false)
+        handleAnswer(isCorrect: false)
     }
     
     private func convert(model: QuizQuestion) -> QuizStepViewModel {
@@ -85,7 +85,7 @@ final class MovieQuizViewController: UIViewController {
         yesButton.isEnabled.toggle()
     }
     
-    private func handleAnswer(button: UIButton, isCorrect: Bool) {
+    private func handleAnswer(isCorrect: Bool) {
         enableButtonToggle()
         
         DispatchQueue.main.async { [weak self] in
