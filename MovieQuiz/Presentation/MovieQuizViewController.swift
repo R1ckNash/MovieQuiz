@@ -42,6 +42,8 @@ final class MovieQuizViewController: UIViewController {
     @IBOutlet private weak var imageView: UIImageView!
     @IBOutlet private weak var textLabel: UILabel!
     @IBOutlet private weak var counterLabel: UILabel!
+    @IBOutlet private weak var noButton: UIButton!
+    @IBOutlet private weak var yesButton: UIButton!
     
     // MARK: - Lifecycle
     override func viewDidLoad() {
@@ -58,11 +60,11 @@ final class MovieQuizViewController: UIViewController {
     
     //MARK: - Actions
     @IBAction private func yesButtonClicked(_ sender: UIButton) {
-        handleAnswer(isCorrect: true)
+        handleAnswer(button: sender, isCorrect: true)
     }
     
     @IBAction private func noButtonClicked(_ sender: UIButton) {
-        handleAnswer(isCorrect: false)
+        handleAnswer(button: sender, isCorrect: false)
     }
     
     private func convert(model: QuizQuestion) -> QuizStepViewModel {
@@ -78,7 +80,14 @@ final class MovieQuizViewController: UIViewController {
         counterLabel.text = step.questionNumber
     }
     
-    private func handleAnswer(isCorrect: Bool) {
+    private func enableButtonToggle() {
+        noButton.isEnabled.toggle()
+        yesButton.isEnabled.toggle()
+    }
+    
+    private func handleAnswer(button: UIButton, isCorrect: Bool) {
+        enableButtonToggle()
+        
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
             self.showAnswerResult(isCorrect: self.questions[self.currentQuestionIndex].correctAnswer == isCorrect)
@@ -87,6 +96,8 @@ final class MovieQuizViewController: UIViewController {
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
             guard let self = self else { return }
             self.showNextQuestionOrResults()
+            
+            enableButtonToggle()
         }
     }
     
@@ -119,7 +130,8 @@ final class MovieQuizViewController: UIViewController {
                                       message: model.text,
                                       preferredStyle: .alert)
         
-        let action = UIAlertAction(title: model.buttonText, style: .default) { _ in
+        let action = UIAlertAction(title: model.buttonText, style: .default) { [weak self] _ in
+            guard let self = self else { return }
             self.restartQuiz()
         }
         alert.addAction(action)
