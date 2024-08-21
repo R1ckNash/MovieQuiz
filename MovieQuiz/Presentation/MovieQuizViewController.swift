@@ -6,6 +6,8 @@ final class MovieQuizViewController: UIViewController {
     private let questionsAmount: Int = 10
     private var questionFactory: QuestionFactoryProtocol?
     private var currentQuestion: QuizQuestion?
+    private var statisticService: StatisticServiceProtocol?
+    private var alertPresenter: AlertPresenter?
     
     private var currentQuestionIndex: Int = 0
     private var correctAnswers: Int = 0
@@ -24,8 +26,19 @@ final class MovieQuizViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        let allValues = UserDefaults.standard.dictionaryRepresentation()
+        
+                // Печатаем или обрабатываем все ключи и значения
+                for (key, value) in allValues {
+                    print("\(key) - \(value)")
+                }
+        
         questionFactory = QuestionFactory(delegate: self)
         questionFactory?.requestNextQuestion()
+        
+        statisticService = StatisticService()
+        
+        alertPresenter = AlertPresenter(viewController: self)
         
         imageView.layer.masksToBounds = true
         imageView.layer.borderColor = UIColor.clear.cgColor
@@ -89,8 +102,21 @@ final class MovieQuizViewController: UIViewController {
     
     private func showNextQuestionOrResults() {
         if currentQuestionIndex == questionsAmount - 1 {
+            
+            statisticService?.store(correct: correctAnswers, total: 1)
+            
+            let bestGameDate = statisticService?.bestGame.date.dateTimeString ?? ""
+            let accuracy = statisticService?.totalAccuracy ?? 0.0
+            let bestGameResult = "\(statisticService?.bestGame.correct ?? 0)/10"
+            let message = """
+                            Ваш результат: \(correctAnswers)/\(questionsAmount)
+                            Количество сыгранных квизов: \(statisticService?.gamesCount ?? 0)
+                            Рекорд: \(bestGameResult) (\(bestGameDate))
+                            Средняя точность: \(String(format: "%.2f", accuracy))% 
+                            """
+            
             showAlert(model: QuizResultsViewModel(title: "Этот раунд окончен!",
-                                                  text: "Ваш результат: \(correctAnswers)/10",
+                                                  text: message,
                                                   buttonText: "Сыграть еще раз"))
         } else {
             currentQuestionIndex += 1
@@ -99,16 +125,13 @@ final class MovieQuizViewController: UIViewController {
     }
     
     private func showAlert(model: QuizResultsViewModel) {
-        let alert = UIAlertController(title: model.title,
-                                      message: model.text,
-                                      preferredStyle: .alert)
-        
-        let action = UIAlertAction(title: model.buttonText, style: .default) { [weak self] _ in
+        let alertModel = AlertModel(title: model.title,
+                                    message: model.text,
+                                    buttonText: model.buttonText) { [weak self] in
             guard let self = self else { return }
             self.restartQuiz()
         }
-        alert.addAction(action)
-        self.present(alert, animated: true, completion: nil)
+        alertPresenter?.showAlert(model: alertModel)
     }
     
     private func restartQuiz() {
