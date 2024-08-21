@@ -26,13 +26,6 @@ final class MovieQuizViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        let allValues = UserDefaults.standard.dictionaryRepresentation()
-        
-                // Печатаем или обрабатываем все ключи и значения
-                for (key, value) in allValues {
-                    print("\(key) - \(value)")
-                }
-        
         questionFactory = QuestionFactory(delegate: self)
         questionFactory?.requestNextQuestion()
         

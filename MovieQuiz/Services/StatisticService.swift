@@ -17,6 +17,13 @@ final class StatisticService: StatisticServiceProtocol {
         case gamesCount
     }
     
+    enum BestGameKeys: String {
+        case bestGameCorrect
+        case bestGameTotal
+        case bestGameDate
+    }
+
+    
     var gamesCount: Int {
         get {
             userDefaults.integer(forKey: Keys.gamesCount.rawValue)
@@ -28,18 +35,23 @@ final class StatisticService: StatisticServiceProtocol {
     
     var bestGame: GameResult {
         get {
-            guard let data = userDefaults.data(forKey: Keys.bestGame.rawValue),
-                  let gameResult = try? JSONDecoder().decode(GameResult.self, from: data) else {
+            let correct = userDefaults.integer(forKey: BestGameKeys.bestGameCorrect.rawValue)
+            let total = userDefaults.integer(forKey: BestGameKeys.bestGameTotal.rawValue)
+            let date = userDefaults.double(forKey: BestGameKeys.bestGameDate.rawValue)
+            
+            if correct == 0 && total == 0 && date == 0 {
                 return GameResult(correct: 0, total: 0, date: Date())
             }
-            return gameResult
+            
+            return GameResult(correct: correct, total: total, date: Date(timeIntervalSince1970: date))
         }
         set {
-            if let data = try? JSONEncoder().encode(newValue) {
-                userDefaults.set(data, forKey: Keys.bestGame.rawValue)
-            }
+            userDefaults.set(newValue.correct, forKey: BestGameKeys.bestGameCorrect.rawValue)
+            userDefaults.set(newValue.total, forKey: BestGameKeys.bestGameTotal.rawValue)
+            userDefaults.set(newValue.date.timeIntervalSince1970, forKey: BestGameKeys.bestGameDate.rawValue)
         }
     }
+
     
     var totalAccuracy: Double {
         let correctAnswers = correctAnswers
