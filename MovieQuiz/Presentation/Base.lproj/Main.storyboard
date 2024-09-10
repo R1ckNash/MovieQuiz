@@ -8,6 +8,14 @@
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
+    <customFonts key="customFonts">
+        <array key="YS Display-Bold.ttf">
+            <string>YSDisplay-Bold</string>
+        </array>
+        <array key="YS Display-Medium.ttf">
+            <string>YSDisplay-Medium</string>
+        </array>
+    </customFonts>
     <scenes>
         <!--Movie Quiz View Controller-->
         <scene sceneID="tne-QT-ifu">
@@ -94,6 +102,9 @@
                                     </stackView>
                                 </subviews>
                             </stackView>
+                            <activityIndicatorView opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" style="medium" translatesAutoresizingMaskIntoConstraints="NO" id="FP7-It-7iZ">
+                                <rect key="frame" x="197" y="438" width="20" height="20"/>
+                            </activityIndicatorView>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                         <color key="backgroundColor" name="YP Black"/>
@@ -101,10 +112,13 @@
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="P4A-eX-RpZ" secondAttribute="trailing" constant="20" id="6mW-ZB-mzO"/>
                             <constraint firstItem="P4A-eX-RpZ" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="20" id="ILa-vq-dIM"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="bottom" secondItem="P4A-eX-RpZ" secondAttribute="bottom" id="QDY-1R-pqn"/>
+                            <constraint firstItem="FP7-It-7iZ" firstAttribute="centerY" secondItem="8bC-Xf-vdC" secondAttribute="centerY" id="QRJ-wR-2um"/>
                             <constraint firstItem="P4A-eX-RpZ" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" constant="10" id="f3Y-vq-aCf"/>
+                            <constraint firstItem="FP7-It-7iZ" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="s6i-9S-3xS"/>
                         </constraints>
                     </view>
                     <connections>
+                        <outlet property="activityIndicator" destination="FP7-It-7iZ" id="wtK-Fe-YEs"/>
                         <outlet property="counterLabel" destination="jSj-ty-ygN" id="jeJ-98-8bv"/>
                         <outlet property="imageView" destination="Dkv-R2-cgg" id="Ad8-XS-2cs"/>
                         <outlet property="noButton" destination="FLV-8N-Wxq" id="win-xC-Qmo"/>
