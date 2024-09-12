@@ -29,7 +29,13 @@ struct MoviesLoader: MoviesLoading {
             case .success(let data):
                 do {
                     let mostPopularMovies = try JSONDecoder().decode(MostPopularMovies.self, from: data)
-                    handler(.success(mostPopularMovies))
+                    
+                    if mostPopularMovies.errorMessage.isEmpty {
+                        handler(.success(mostPopularMovies))
+                    } else {
+                        let error = ApiError.errorMessage(mostPopularMovies.errorMessage)
+                        handler(.failure(error))
+                    }
                 } catch {
                     handler(.failure(error))
                 }
@@ -38,5 +44,9 @@ struct MoviesLoader: MoviesLoading {
                 handler(.failure(error))
             }
         }
+    }
+    
+    private enum ApiError: Error {
+        case errorMessage(String)
     }
 }

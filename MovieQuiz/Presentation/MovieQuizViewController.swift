@@ -34,6 +34,8 @@ final class MovieQuizViewController: UIViewController {
         alertPresenter = AlertPresenter(viewController: self)
         
         setupStyle()
+        setupBehavior()
+        
         initialLoading()
     }
     
@@ -58,6 +60,12 @@ final class MovieQuizViewController: UIViewController {
         imageView.layer.borderColor = UIColor.clear.cgColor
         imageView.layer.borderWidth = 8
         imageView.layer.cornerRadius = 20
+        
+        activityIndicator.style = .large
+    }
+    
+    private func setupBehavior() {
+        activityIndicator.hidesWhenStopped = true
     }
     
     private func convert(model: QuizQuestion) -> QuizStepViewModel {
@@ -85,14 +93,17 @@ final class MovieQuizViewController: UIViewController {
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
             guard let currentQuestion = currentQuestion else { return }
+            
             self.showAnswerResult(isCorrect: currentQuestion.correctAnswer == isCorrect)
         }
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
             guard let self = self else { return }
+            
+            self.showLoadingIndicator()
             self.showNextQuestionOrResults()
             
-            enableButtonToggle()
+            self.enableButtonToggle()
         }
     }
     
@@ -164,12 +175,11 @@ final class MovieQuizViewController: UIViewController {
     }
     
     private func showLoadingIndicator() {
-        activityIndicator.isHidden = false
         activityIndicator.startAnimating()
     }
     
     private func hideLoadingIndicator() {
-        activityIndicator.isHidden = true
+        activityIndicator.stopAnimating()
     }
 }
 
@@ -186,7 +196,7 @@ extension MovieQuizViewController: QuestionFactoryDelegate {
     }
     
     func didReceiveNextQuestion(question: QuizQuestion?) {
-        
+        hideLoadingIndicator()
         guard let question = question else { return }
         
         currentQuestion = question
