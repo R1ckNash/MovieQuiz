@@ -7,7 +7,7 @@ final class MovieQuizViewController: UIViewController {
     private var questionFactory: QuestionFactoryProtocol?
     private var currentQuestion: QuizQuestion?
     private var statisticService: StatisticServiceProtocol?
-    private var alertPresenter: AlertPresenter?
+    private var alertPresenter: AlertPresenter!
     
     private var currentQuestionIndex: Int = 0
     private var correctAnswers: Int = 0
@@ -148,7 +148,7 @@ final class MovieQuizViewController: UIViewController {
             self.restartQuiz()
         }
         
-        alertPresenter?.showAlert(model: alertModel)
+        alertPresenter.showAlert(model: alertModel)
     }
     
     private func showNetworkError(message: String) {
@@ -165,7 +165,7 @@ final class MovieQuizViewController: UIViewController {
             self.questionFactory?.requestNextQuestion()
         }
         
-        alertPresenter?.showAlert(model: alertModel)
+        alertPresenter.showAlert(model: alertModel)
     }
     
     private func restartQuiz() {
