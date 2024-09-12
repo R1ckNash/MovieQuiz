@@ -42,8 +42,23 @@ final class QuestionFactory: QuestionFactoryProtocol {
             
             let rating = Float(movie.rating) ?? 0
             
-            let text = "Рейтинг этого фильма больше чем 7?"
-            let correctAnswer = rating > 7
+            let totalRating = self.movies.compactMap { Float($0.rating) }.reduce(0, +)
+            let averageRating = totalRating / Float(self.movies.count)
+            
+            let adjustment = Float.random(in: -1.0...1.0)
+            let threshold = ((averageRating + adjustment) * 10).rounded() / 10
+            
+            let comparisonIsGreater = Bool.random()
+            let text: String
+            let correctAnswer: Bool
+            
+            if comparisonIsGreater {
+                text = "Рейтинг этого фильма больше чем \(threshold)?"
+                correctAnswer = rating > threshold
+            } else {
+                text = "Рейтинг этого фильма меньше чем \(threshold)?"
+                correctAnswer = rating < threshold
+            }
             
             let question = QuizQuestion(image: imageData,
                                         text: text,
