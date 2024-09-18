@@ -11,16 +11,31 @@ protocol MoviesLoading {
     func loadMovies(handler: @escaping (Result<MostPopularMovies, Error>) -> Void)
 }
 
-struct MoviesLoader: MoviesLoading {
+struct MoviesLoader {
     
-    private let networkClient = NetworkClient()
+    //MARK: - Properties
+    private let networkClient: NetworkRouting
     
+    //MARK: - Lifecycle
+    init(networkClient: NetworkRouting = NetworkClient()) {
+        self.networkClient = networkClient
+    }
+    
+    //MARK: - Computed properties
     private var mostPopularMoviesUrl: URL {
         guard let url = URL(string: "https://tv-api.com/en/API/Top250Movies/k_zcuw1ytf") else {
             preconditionFailure("Unable to construct mostPopularMoviesUrl")
         }
         return url
     }
+    
+    private enum ApiError: Error {
+        case errorMessage(String)
+    }
+}
+
+//MARK: - Extensions
+extension MoviesLoader: MoviesLoading {
     
     func loadMovies(handler: @escaping (Result<MostPopularMovies, Error>) -> Void) {
         
@@ -44,9 +59,5 @@ struct MoviesLoader: MoviesLoading {
                 handler(.failure(error))
             }
         }
-    }
-    
-    private enum ApiError: Error {
-        case errorMessage(String)
     }
 }
