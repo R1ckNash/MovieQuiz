@@ -8,13 +8,20 @@
 import Foundation
 import UIKit
 
-class AlertPresenter {
+protocol AlertPresenterProtocol {
+    func showAlert(model: AlertModel)
+}
+
+final class AlertPresenter {
     
     private weak var viewController: UIViewController?
     
     init(viewController: UIViewController) {
         self.viewController = viewController
     }
+}
+
+extension AlertPresenter: AlertPresenterProtocol {
     
     func showAlert(model: AlertModel) {
         let alert = UIAlertController(title: model.title, message: model.message, preferredStyle: .alert)
@@ -24,6 +31,9 @@ class AlertPresenter {
         }
         
         alert.addAction(action)
-        viewController?.present(alert, animated: true, completion: nil)
+        DispatchQueue.main.async { [weak self] in
+            self?.viewController?.present(alert, animated: true, completion: nil)
+        }
     }
+    
 }
