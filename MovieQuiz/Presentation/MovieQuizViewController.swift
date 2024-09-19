@@ -1,10 +1,19 @@
 import UIKit
 
+protocol MovieQuizViewControllerProtocol: AnyObject {
+    func enableButtonToggle()
+    func show(quiz step: QuizStepViewModel)
+    func showLoadingIndicator()
+    func hideLoadingIndicator()
+    func showAlert(model: AlertModel)
+    func showAnswerResult(color: CGColor)
+}
+
 final class MovieQuizViewController: UIViewController {
     
     //MARK: - Properties
     private var alertPresenter: AlertPresenterProtocol!
-    private var moviewQuizPresenter: MoviewQuizPresenterProtocol!
+    private var moviewQuizPresenter: MovieQuizPresenterProtocol!
     
     //MARK: - IBOutlets
     @IBOutlet private weak var imageView: UIImageView!
@@ -18,7 +27,7 @@ final class MovieQuizViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        moviewQuizPresenter = MoviewQuizPresenter(viewController: self)
+        moviewQuizPresenter = MovieQuizPresenter(viewController: self)
         alertPresenter = AlertPresenter(viewController: self)
         
         setupStyle()

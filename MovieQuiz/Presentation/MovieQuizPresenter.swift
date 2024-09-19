@@ -1,5 +1,5 @@
 //
-//  MoviewQuizPresenter.swift
+//  MovieQuizPresenter.swift
 //  MovieQuiz
 //
 //  Created by Ilia Liasin on 12/09/2024.
@@ -8,22 +8,13 @@
 import Foundation
 import UIKit
 
-protocol MovieQuizViewControllerProtocol: AnyObject {
-    func enableButtonToggle()
-    func show(quiz step: QuizStepViewModel)
-    func showLoadingIndicator()
-    func hideLoadingIndicator()
-    func showAlert(model: AlertModel)
-    func showAnswerResult(color: CGColor)
-}
-
-protocol MoviewQuizPresenterProtocol {
+protocol MovieQuizPresenterProtocol {
     func loadMovies()
     func restartQuiz()
     func handleAnswer(isCorrect: Bool)
 }
 
-final class MoviewQuizPresenter {
+final class MovieQuizPresenter {
     
     //MARK: - Properties
     private var currentQuestion: QuizQuestion?
@@ -66,13 +57,6 @@ final class MoviewQuizPresenter {
         questionFactory?.requestNextQuestion()
     }
     
-    private func convert(model: QuizQuestion) -> QuizStepViewModel {
-        return QuizStepViewModel(
-            image: UIImage(data: model.image) ?? UIImage(),
-            question: model.text,
-            questionNumber: "\(currentQuestionIndex + 1)/\(questionsAmount)")
-    }
-    
     private func showAnswerResult(isCorrect: Bool) {
         DispatchQueue.main.async { [weak self] in
             guard let self else { return }
@@ -103,7 +87,7 @@ final class MoviewQuizPresenter {
             
             showAlert(model: QuizResultsViewModel(title: "Этот раунд окончен!",
                                                   text: message,
-                                                  buttonText: "Сыграть еще раз"))
+                                                  buttonText: "Сыграть ещё раз"))
         } else {
             currentQuestionIndex += 1
             requestNextQuestion()
@@ -139,10 +123,18 @@ final class MoviewQuizPresenter {
         }
     }
     
+    //MARK: - Public methods
+    func convert(model: QuizQuestion) -> QuizStepViewModel {
+        return QuizStepViewModel(
+            image: UIImage(data: model.image) ?? UIImage(),
+            question: model.text,
+            questionNumber: "\(currentQuestionIndex + 1)/\(questionsAmount)")
+    }
+    
 }
 
 //MARK: - Extensions
-extension MoviewQuizPresenter: MoviewQuizPresenterProtocol {
+extension MovieQuizPresenter: MovieQuizPresenterProtocol {
     
     func loadMovies() {
         showLoadingIndicator()
@@ -173,8 +165,7 @@ extension MoviewQuizPresenter: MoviewQuizPresenterProtocol {
     
 }
 
-//MARK: - Delegates
-extension MoviewQuizPresenter: QuestionFactoryDelegate {
+extension MovieQuizPresenter: QuestionFactoryDelegate {
     
     func didLoadDataFromServer() {
         hideLoadingIndicator()

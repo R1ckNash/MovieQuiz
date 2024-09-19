@@ -94,7 +94,7 @@ class MoviesLoaderTests: XCTestCase {
         loader.loadMovies { result in
             // Then
             switch result {
-            case .success(let movies):
+            case .success(_):
                 XCTFail("Unexpected failure")
             case .failure(let error):
                 XCTAssertNotNil(error)
