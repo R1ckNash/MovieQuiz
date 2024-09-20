@@ -7,8 +7,17 @@
 
 import Foundation
 
-final class StatisticService: StatisticServiceProtocol {
+protocol StatisticServiceProtocol {
     
+    var gamesCount: Int { get }
+    var bestGame: GameResult { get }
+    var totalAccuracy: Double { get }
+    func store(correct count: Int, total amount: Int)
+}
+
+final class StatisticService {
+    
+    //MARK: - Properties
     private let userDefaults = UserDefaults.standard
     
     private enum Keys: String {
@@ -17,12 +26,25 @@ final class StatisticService: StatisticServiceProtocol {
         case gamesCount
     }
     
-    enum BestGameKeys: String {
+    private enum BestGameKeys: String {
         case bestGameCorrect
         case bestGameTotal
         case bestGameDate
     }
+    
+    private var correctAnswers: Int {
+        get {
+            return userDefaults.integer(forKey: Keys.correct.rawValue)
+        }
+        set {
+            userDefaults.set(newValue, forKey: Keys.correct.rawValue)
+        }
+    }
+    
+}
 
+//MARK: - Extensions
+extension StatisticService: StatisticServiceProtocol {
     
     var gamesCount: Int {
         get {
@@ -51,7 +73,6 @@ final class StatisticService: StatisticServiceProtocol {
             userDefaults.set(newValue.date.timeIntervalSince1970, forKey: BestGameKeys.bestGameDate.rawValue)
         }
     }
-
     
     var totalAccuracy: Double {
         let correctAnswers = correctAnswers
@@ -64,15 +85,6 @@ final class StatisticService: StatisticServiceProtocol {
         return (Double(correctAnswers) / Double(totalQuestions)) * 100
     }
     
-    private var correctAnswers: Int {
-            get {
-                return userDefaults.integer(forKey: Keys.correct.rawValue)
-            }
-            set {
-                userDefaults.set(newValue, forKey: Keys.correct.rawValue)
-            }
-        }
-    
     func store(correct count: Int, total amount: Int) {
         correctAnswers += count
         gamesCount += amount
@@ -82,4 +94,5 @@ final class StatisticService: StatisticServiceProtocol {
             bestGame = currentGameResult
         }
     }
+    
 }

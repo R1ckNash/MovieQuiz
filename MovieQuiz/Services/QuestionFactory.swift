@@ -7,18 +7,35 @@
 
 import Foundation
 
-final class QuestionFactory: QuestionFactoryProtocol {
+protocol QuestionFactoryProtocol: AnyObject {
     
-    private weak var delegate: QuestionFactoryDelegate?
+    var delegate: QuestionFactoryDelegate? { get set }
+    func requestNextQuestion()
+    func loadData()
+}
+
+final class QuestionFactory {
+    
+    //MARK: - Properties
+    weak var delegate: QuestionFactoryDelegate?
     private let moviesLoader: MoviesLoading
     private var movies: [MostPopularMovie] = []
     
-    init(delegate: QuestionFactoryDelegate? = nil, moviesLoader: MoviesLoading) {
-        self.delegate = delegate
+    //MARK: - Lifecycle
+    init(moviesLoader: MoviesLoading) {
         self.moviesLoader = moviesLoader
     }
     
+    private enum LoadError: Error {
+        case loadImageError(String)
+    }
+}
+
+//MARK: - Extensions
+extension QuestionFactory: QuestionFactoryProtocol {
+    
     func requestNextQuestion() {
+        
         DispatchQueue.global().async { [weak self] in
             guard let self = self else { return }
             
@@ -85,9 +102,5 @@ final class QuestionFactory: QuestionFactoryProtocol {
                 }
             }
         }
-    }
-    
-    private enum LoadError: Error {
-        case loadImageError(String)
     }
 }
