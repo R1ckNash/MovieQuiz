@@ -9,9 +9,8 @@ import Foundation
 import UIKit
 
 protocol MovieQuizPresenterProtocol {
-    func loadMovies()
-    func restartQuiz()
-    func handleAnswer(isCorrect: Bool)
+    func viewDidLoad()
+    func didTapAnswerButton(isCorrect: Bool)
 }
 
 final class MovieQuizPresenter {
@@ -27,17 +26,20 @@ final class MovieQuizPresenter {
     
     private weak var view: MovieQuizViewControllerProtocol?
     
-    private var questionFactory: QuestionFactoryProtocol?
-    private var statisticService: StatisticServiceProtocol?
+    private lazy var questionFactory: QuestionFactoryProtocol = {
+        return QuestionFactory(delegate: self, moviesLoader: MoviesLoader())
+    }()
+    
+    private lazy var statisticService: StatisticServiceProtocol = {
+        return StatisticService()
+    }()
     
     
     //MARK: - Lifecycle
     init(viewController: MovieQuizViewControllerProtocol) {
         self.view = viewController
         
-        questionFactory = QuestionFactory(delegate: self, moviesLoader: MoviesLoader())
-        questionFactory?.requestNextQuestion()
-        statisticService = StatisticService()
+        questionFactory.requestNextQuestion()
     }
     
     //MARK: - Private functions
@@ -54,7 +56,7 @@ final class MovieQuizPresenter {
     }
     
     private func requestNextQuestion() {
-        questionFactory?.requestNextQuestion()
+        questionFactory.requestNextQuestion()
     }
     
     private func showAnswerResult(isCorrect: Bool) {
@@ -73,14 +75,14 @@ final class MovieQuizPresenter {
     private func showNextQuestionOrResults() {
         if currentQuestionIndex == questionsAmount - 1 {
             
-            statisticService?.store(correct: correctAnswers, total: 1)
+            statisticService.store(correct: correctAnswers, total: 1)
             
-            let bestGameDate = statisticService?.bestGame.date.dateTimeString ?? ""
-            let accuracy = statisticService?.totalAccuracy ?? 0.0
-            let bestGameResult = "\(statisticService?.bestGame.correct ?? 0)/10"
+            let bestGameDate = statisticService.bestGame.date.dateTimeString
+            let accuracy = statisticService.totalAccuracy
+            let bestGameResult = "\(statisticService.bestGame.correct)/10"
             let message = """
                             Ваш результат: \(correctAnswers)/\(questionsAmount)
-                            Количество сыгранных квизов: \(statisticService?.gamesCount ?? 0)
+                            Количество сыгранных квизов: \(statisticService.gamesCount)
                             Рекорд: \(bestGameResult) (\(bestGameDate))
                             Средняя точность: \(String(format: "%.2f", accuracy))%
                             """
@@ -123,9 +125,15 @@ final class MovieQuizPresenter {
         }
     }
     
+    private func restartQuiz() {
+        currentQuestionIndex = 0
+        correctAnswers = 0
+        requestNextQuestion()
+    }
+    
     //MARK: - Public methods
     func convert(model: QuizQuestion) -> QuizStepViewModel {
-        return QuizStepViewModel(
+        QuizStepViewModel(
             image: UIImage(data: model.image) ?? UIImage(),
             question: model.text,
             questionNumber: "\(currentQuestionIndex + 1)/\(questionsAmount)")
@@ -136,12 +144,12 @@ final class MovieQuizPresenter {
 //MARK: - Extensions
 extension MovieQuizPresenter: MovieQuizPresenterProtocol {
     
-    func loadMovies() {
+    func viewDidLoad() {
         showLoadingIndicator()
-        questionFactory?.loadData()
+        questionFactory.loadData()
     }
     
-    func handleAnswer(isCorrect: Bool) {
+    func didTapAnswerButton(isCorrect: Bool) {
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
             guard let currentQuestion = currentQuestion else { return }
@@ -157,19 +165,13 @@ extension MovieQuizPresenter: MovieQuizPresenterProtocol {
         }
     }
     
-    func restartQuiz() {
-        currentQuestionIndex = 0
-        correctAnswers = 0
-        requestNextQuestion()
-    }
-    
 }
 
 extension MovieQuizPresenter: QuestionFactoryDelegate {
     
     func didLoadDataFromServer() {
         hideLoadingIndicator()
-        questionFactory?.requestNextQuestion()
+        questionFactory.requestNextQuestion()
     }
     
     func didFailToLoadData(with error: any Error) {

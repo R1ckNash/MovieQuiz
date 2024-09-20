@@ -48,7 +48,7 @@ final class MovieQuizPresenterTests: XCTestCase {
         
         let expectation = XCTestExpectation(description: "Color change expectation")
         
-        presenter.handleAnswer(isCorrect: true)
+        presenter.didTapAnswerButton(isCorrect: true)
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
             let expectedColor = UIColor.ypGreen.cgColor
@@ -72,7 +72,7 @@ final class MovieQuizPresenterTests: XCTestCase {
         
         let expectation = XCTestExpectation(description: "Color change expectation")
         
-        presenter.handleAnswer(isCorrect: false)
+        presenter.didTapAnswerButton(isCorrect: false)
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
             let expectedColor = UIColor.ypRed.cgColor
