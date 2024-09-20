@@ -14,13 +14,16 @@ protocol AlertPresenterProtocol {
 
 final class AlertPresenter {
     
+    //MARK: - Poperties
     private weak var viewController: UIViewController?
     
+    //MARK: - Lifecycle
     init(viewController: UIViewController) {
         self.viewController = viewController
     }
 }
 
+//MARK: - Extensions
 extension AlertPresenter: AlertPresenterProtocol {
     
     func showAlert(model: AlertModel) {

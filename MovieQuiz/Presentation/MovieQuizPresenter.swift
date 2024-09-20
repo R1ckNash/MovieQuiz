@@ -26,18 +26,16 @@ final class MovieQuizPresenter {
     
     private weak var view: MovieQuizViewControllerProtocol?
     
-    private lazy var questionFactory: QuestionFactoryProtocol = {
-        return QuestionFactory(delegate: self, moviesLoader: MoviesLoader())
-    }()
-    
-    private lazy var statisticService: StatisticServiceProtocol = {
-        return StatisticService()
-    }()
+    private let questionFactory: QuestionFactoryProtocol
+    private let statisticService: StatisticServiceProtocol
     
     
     //MARK: - Lifecycle
     init(viewController: MovieQuizViewControllerProtocol) {
         self.view = viewController
+        self.statisticService = StatisticService()
+        self.questionFactory = QuestionFactory(moviesLoader: MoviesLoader())
+        questionFactory.delegate = self
         
         questionFactory.requestNextQuestion()
     }
